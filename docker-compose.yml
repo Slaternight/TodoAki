@@ -1,0 +1,81 @@
+# WordPress + WooCommerce local para desarrollar la tienda.
+#
+#   docker compose up -d                                  # WordPress en :8080, correos en :8025
+#   docker compose run --rm wpcli sh /setup/setup.sh      # instala WooCommerce, el plugin y datos de prueba
+#   docker compose run --rm wpcli wp plugin list          # cualquier comando de WP-CLI
+#   docker compose down                                   # apaga (los datos se conservan)
+
+name: tienda-headless
+
+x-wp-env: &wp-env
+  WORDPRESS_DB_HOST: db
+  WORDPRESS_DB_USER: wordpress
+  WORDPRESS_DB_PASSWORD: wordpress
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_CONFIG_EXTRA: |
+    define('WP_ENVIRONMENT_TYPE', 'local');
+    // Desde el contenedor, Next.js (puerto 3000 de tu PC) se alcanza por host.docker.internal.
+    define('TH_REVALIDATE_URL', 'http://host.docker.internal:3000/api/revalidate');
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  wordpress:
+    image: wordpress:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment: *wp-env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - wp:/var/www/html
+      # El plugin se monta desde este repo: los cambios se ven sin reinstalar.
+      - ./wordpress-plugin/tienda-headless:/var/www/html/wp-content/plugins/tienda-headless
+      - ./docker/mailpit.php:/var/www/html/wp-content/mu-plugins/mailpit.php:ro
+
+  # Bandeja de correo de prueba: aquí llegan los correos de pedidos (http://localhost:8025)
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+
+  wpcli:
+    image: wordpress:cli
+    profiles: ["tools"]
+    user: "33:33" # mismo usuario que Apache en la imagen de WordPress
+    depends_on:
+      - wordpress
+    environment:
+      <<: *wp-env
+      WP_CLI_CACHE_DIR: /tmp/wp-cli-cache
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - wp:/var/www/html
+      - ./wordpress-plugin/tienda-headless:/var/www/html/wp-content/plugins/tienda-headless
+      - ./docker/mailpit.php:/var/www/html/wp-content/mu-plugins/mailpit.php:ro
+      - ./docker:/setup:ro
+
+volumes:
+  db:
+  wp:

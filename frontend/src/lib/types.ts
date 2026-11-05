@@ -152,3 +152,28 @@ export type StoreApiError = {
   code: string;
   message: string;
 };
+
+// ---------------------------------------------------------------------------
+// Cuentas de cliente (endpoints tienda-headless/v1/auth del plugin).
+// ---------------------------------------------------------------------------
+
+export type AuthUser = {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  display_name: string;
+};
+
+export type AccountOrder = {
+  id: number;
+  number: string;
+  // Fecha en formato ISO corto (YYYY-MM-DD).
+  date: string;
+  status: string;
+  status_label: string;
+  // Total como string decimal (ej. "27000"); la moneda va aparte.
+  total: string;
+  currency: string;
+  items: { name: string; quantity: number }[];
+};

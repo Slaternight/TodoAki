@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { decodeEntities, formatPrice, variationLabel } from "@/lib/format";
 import type { Address, BillingAddress, Cart } from "@/lib/types";
+import { useAuth } from "./AuthProvider";
 import { useCart } from "./CartProvider";
 import { CartSummary } from "./CartSummary";
 
@@ -50,10 +51,17 @@ export function CheckoutForm({ states }: { states: Record<string, string> }) {
 
 function CheckoutSteps({ cart, states }: { cart: Cart; states: Record<string, string> }) {
   const { mutate, pending, error } = useCart();
+  const { user } = useAuth();
   const [form, setForm] = useState(() => initialForm(cart));
   const [step, setStep] = useState<"address" | "review">("address");
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
+
+  // Si hay sesión, precargamos el correo de la cuenta para que el pedido quede
+  // ligado a tu cuenta (sin pisar lo que el usuario ya haya escrito).
+  useEffect(() => {
+    if (user?.email) setForm((f) => (f.email ? f : { ...f, email: user.email }));
+  }, [user]);
 
   const field = (name: keyof FormState) => ({
     name,

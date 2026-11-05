@@ -24,6 +24,7 @@ add_action(
 		require_once TIENDA_HEADLESS_DIR . '/includes/rest.php';
 		require_once TIENDA_HEADLESS_DIR . '/includes/revalidate.php';
 		require_once TIENDA_HEADLESS_DIR . '/includes/store-api.php';
+		require_once TIENDA_HEADLESS_DIR . '/includes/auth.php';
 
 		add_filter(
 			'woocommerce_payment_gateways',

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { AccountMenu } from "@/components/AccountMenu";
 import { CartLink } from "@/components/CartLink";
 import { CategoryBar } from "@/components/CategoryBar";
 import { SearchBar } from "@/components/SearchBar";
@@ -42,6 +43,7 @@ export function SiteHeader() {
             <Logo />
           </Link>
           <SearchBar className="hidden min-w-0 flex-1 sm:block" />
+          <AccountMenu />
           <CartLink />
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-3 sm:hidden">

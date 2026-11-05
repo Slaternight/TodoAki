@@ -8,7 +8,7 @@ import type { Category, Product, ProductVariation } from "./types";
 
 const CART_COOKIE = "wc_cart_token";
 
-function wpUrl(path: string) {
+export function wpUrl(path: string) {
   const base = process.env.WC_STORE_URL?.replace(/\/$/, "");
   if (!base) {
     throw new Error("Falta la variable de entorno WC_STORE_URL (ver .env.example)");

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Poppins } from "next/font/google";
+import { AuthProvider } from "@/components/AuthProvider";
 import { CartProvider } from "@/components/CartProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -30,12 +31,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="es" className={`${geistSans.variable} ${poppins.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-background text-foreground">
-        <CartProvider>
-          <SiteHeader />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
-          <SiteFooter />
-          <ScrollToTop />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <SiteHeader />
+            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+            <SiteFooter />
+            <ScrollToTop />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

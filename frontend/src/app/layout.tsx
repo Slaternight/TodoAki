@@ -5,6 +5,8 @@ import { CartProvider } from "@/components/CartProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { TawkChat } from "@/components/TawkChat";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,6 +39,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
             <SiteFooter />
             <ScrollToTop />
+            <WhatsAppButton />
+            <TawkChat />
           </CartProvider>
         </AuthProvider>
       </body>

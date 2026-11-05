@@ -20,7 +20,7 @@ export function ScrollToTop() {
       aria-label="Volver arriba"
       aria-hidden={!visible}
       tabIndex={visible ? 0 : -1}
-      className={`group fixed bottom-6 right-6 z-50 grid h-12 w-12 place-items-center rounded-full bg-brand-600 text-white shadow-lg shadow-brand-600/30 transition-all duration-300 ease-out hover:bg-brand-700 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/40 ${
+      className={`group fixed bottom-24 right-6 z-50 grid h-12 w-12 place-items-center rounded-full bg-brand-600 text-white shadow-lg shadow-brand-600/30 transition-all duration-300 ease-out hover:bg-brand-700 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/40 ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
       }`}
     >

@@ -5,6 +5,7 @@ import type { AuthUser } from "@/lib/types";
 
 type Credentials = { email: string; password: string };
 type RegisterInput = Credentials & { first_name?: string; last_name?: string };
+type ProfileInput = { first_name: string; last_name: string; billing: Record<string, string> };
 type Outcome = { ok: boolean; error?: string };
 
 type AuthContextValue = {
@@ -12,6 +13,7 @@ type AuthContextValue = {
   loading: boolean;
   login: (input: Credentials) => Promise<Outcome>;
   register: (input: RegisterInput) => Promise<Outcome>;
+  updateProfile: (input: ProfileInput) => Promise<Outcome>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 };
@@ -62,6 +64,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [submit],
   );
 
+  const updateProfile = useCallback(async (input: ProfileInput): Promise<Outcome> => {
+    try {
+      const res = await fetch("/api/account/perfil", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        return { ok: false, error: (data as { error?: string } | null)?.error ?? "No se pudo guardar." };
+      }
+      setUser((data?.user as AuthUser) ?? null);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: "No hay conexión con la tienda. Intenta de nuevo." };
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await fetch("/api/account/logout", { method: "POST" });
@@ -71,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refresh }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateProfile, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   );

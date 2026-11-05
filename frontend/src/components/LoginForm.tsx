@@ -73,6 +73,11 @@ export function LoginForm() {
             placeholder="Tu contraseña"
           />
         </div>
+        <div className="-mt-1 text-right">
+          <Link href="/recuperar" className="text-sm font-medium text-brand-600 hover:underline">
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </div>
         <button type="submit" className="btn btn-primary btn-md w-full" disabled={submitting}>
           {submitting ? "Entrando…" : "Entrar"}
         </button>

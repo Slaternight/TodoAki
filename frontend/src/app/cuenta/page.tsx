@@ -52,6 +52,18 @@ export default async function CuentaPage() {
           <span aria-hidden className="text-xl text-brand-600">→</span>
         </Link>
         <Link
+          href="/cuenta/perfil"
+          className="card flex items-center justify-between p-5 transition hover:shadow-md"
+        >
+          <span>
+            <span className="block font-semibold text-zinc-800">Editar perfil</span>
+            <span className="block text-sm text-zinc-500">Tus datos y dirección guardada</span>
+          </span>
+          <span aria-hidden className="text-xl text-brand-600">
+            →
+          </span>
+        </Link>
+        <Link
           href="/"
           className="card flex items-center justify-between p-5 transition hover:shadow-md"
         >

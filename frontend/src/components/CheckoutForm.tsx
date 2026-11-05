@@ -57,10 +57,23 @@ function CheckoutSteps({ cart, states }: { cart: Cart; states: Record<string, st
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
 
-  // Si hay sesión, precargamos el correo de la cuenta para que el pedido quede
-  // ligado a tu cuenta (sin pisar lo que el usuario ya haya escrito).
+  // Si hay sesión, precargamos el correo y la dirección guardada de la cuenta
+  // (sin pisar lo que venga del carrito ni lo que el usuario ya haya escrito).
   useEffect(() => {
-    if (user?.email) setForm((f) => (f.email ? f : { ...f, email: user.email }));
+    if (!user) return;
+    const b = user.billing;
+    setForm((f) => ({
+      ...f,
+      email: f.email || user.email,
+      first_name: f.first_name || b?.first_name || user.first_name || "",
+      last_name: f.last_name || b?.last_name || user.last_name || "",
+      phone: f.phone || b?.phone || "",
+      address_1: f.address_1 || b?.address_1 || "",
+      address_2: f.address_2 || b?.address_2 || "",
+      city: f.city || b?.city || "",
+      state: f.state || b?.state || "",
+      postcode: f.postcode || b?.postcode || "",
+    }));
   }, [user]);
 
   const field = (name: keyof FormState) => ({

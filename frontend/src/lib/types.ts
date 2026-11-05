@@ -157,12 +157,26 @@ export type StoreApiError = {
 // Cuentas de cliente (endpoints tienda-headless/v1/auth del plugin).
 // ---------------------------------------------------------------------------
 
+export type CustomerAddress = {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  address_1: string;
+  address_2: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+};
+
 export type AuthUser = {
   id: number;
   email: string;
   first_name: string;
   last_name: string;
   display_name: string;
+  // Dirección guardada del cliente (puede venir con campos vacíos).
+  billing?: CustomerAddress;
 };
 
 export type AccountOrder = {

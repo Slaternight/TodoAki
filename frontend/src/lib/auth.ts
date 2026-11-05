@@ -105,3 +105,74 @@ export async function getCustomerOrders(): Promise<AccountOrder[]> {
     return [];
   }
 }
+
+// --- Recuperación de contraseña ---
+
+// Siempre "ok": no revelamos si el correo existe. El plugin envía el correo.
+export async function requestPasswordReset(email: string): Promise<{ ok: true }> {
+  try {
+    await fetch(authUrl("/recuperar"), {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ email }),
+    });
+  } catch {
+    // Da igual: igual decimos "revisa tu correo".
+  }
+  return { ok: true };
+}
+
+export async function resetPassword(input: {
+  login: string;
+  key: string;
+  password: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  let res: Response;
+  try {
+    res = await fetch(authUrl("/restablecer"), {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(input),
+    });
+  } catch {
+    return { ok: false, error: "No hay conexión con la tienda. Intenta de nuevo." };
+  }
+  if (!res.ok) {
+    const data = (await res.json().catch(() => null)) as { message?: string } | null;
+    return { ok: false, error: data?.message ?? "No se pudo restablecer la contraseña." };
+  }
+  return { ok: true };
+}
+
+// --- Perfil y dirección (requiere sesión) ---
+
+export async function updateProfile(input: {
+  first_name: string;
+  last_name: string;
+  billing: Record<string, string>;
+}): Promise<AuthResult> {
+  const token = await getAuthToken();
+  if (!token) return { ok: false, error: "Tu sesión expiró. Inicia sesión de nuevo." };
+  let res: Response;
+  try {
+    res = await fetch(authUrl("/perfil"), {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-TH-Auth": token,
+      },
+      body: JSON.stringify(input),
+    });
+  } catch {
+    return { ok: false, error: "No hay conexión con la tienda. Intenta de nuevo." };
+  }
+  const data = (await res.json().catch(() => null)) as { user?: AuthUser; message?: string } | null;
+  if (!res.ok || !data?.user) {
+    return { ok: false, error: data?.message ?? "No se pudo guardar el perfil." };
+  }
+  return { ok: true, user: data.user };
+}

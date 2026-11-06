@@ -1,0 +1,14 @@
+[
+  { "seed": "organizador de cocina", "label": "Cocina" },
+  { "seed": "termo", "label": "Cocina" },
+  { "seed": "audifonos inalambricos", "label": "Tecnología" },
+  { "seed": "smartwatch", "label": "Tecnología" },
+  { "seed": "lampara led", "label": "Hogar" },
+  { "seed": "humidificador", "label": "Hogar" },
+  { "seed": "set de herramientas", "label": "Herramientas" },
+  { "seed": "juguete antiestres", "label": "Juguetes" },
+  { "seed": "carro a control remoto", "label": "Juguetes" },
+  { "seed": "morral", "label": "Bolsos y Morrales" },
+  { "seed": "gafas de sol", "label": "Accesorios" },
+  { "seed": "buzo oversize", "label": "Ropa" }
+]

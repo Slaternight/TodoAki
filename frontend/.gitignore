@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Decisiones del radar (estado local del dueño: aprobar/descartar)
+/data/radar-decisions.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

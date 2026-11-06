@@ -105,10 +105,13 @@ En hPanel activa el **SSL gratis** para `admin.tutienda.com` (suele ser automát
 | `REVALIDATE_SECRET` | el **mismo** texto que pusiste en la pasarela (3.5) |
 | `NEXT_PUBLIC_TAWK_SRC` | (opcional) el `src` del widget de tawk.to, para el chat en vivo |
 | `NEXT_PUBLIC_WHATSAPP` | (opcional) tu número de WhatsApp en formato internacional sin `+` (ej. `573001234567`) |
+| `RADAR_PASSWORD` | (opcional) contraseña del panel privado `/radar` (radar de tendencias). **Si publicas el panel, defínela**: sin ella queda abierto a cualquiera. |
 
 > El **token de Shopify NO va aquí** — solo se usa para importar el catálogo (Parte 3.6), nunca en la tienda en vivo.
 
 > **Chat en vivo y WhatsApp:** si activaste el chat de tawk.to o el botón de WhatsApp, pon `NEXT_PUBLIC_TAWK_SRC` y/o `NEXT_PUBLIC_WHATSAPP` en las variables del host (en Vercel: *Environment Variables* → *redeploy*; en VPS: edita `.env.local` y `pm2 restart tienda`). Si no las defines, esos botones simplemente no aparecen.
+
+> **Panel de tendencias (`/radar`):** es privado, solo para ti. Protégelo con `RADAR_PASSWORD` antes de publicar (sin esa variable queda abierto a cualquiera). Ten en cuenta el host: en **Vercel** el disco es de solo lectura, así que el panel **muestra** las tendencias pero **no guarda** los "Aprobar/Descartar"; en **VPS** sí las guarda. Detalles en la **Parte 9**.
 
 > **Orden importante:** despliega y configura **WordPress primero**, con productos cargados. El `build` del front pre-genera el catálogo y necesita que WordPress ya responda.
 
@@ -217,6 +220,7 @@ Cuando ya pruebes con sandbox y quieras cobrar de verdad:
 - [ ] Una compra de prueba (sandbox) redirige a Wompi y vuelve a `/checkout/resultado`, y el pedido queda registrado (webhook).
 - [ ] Registro, login, "mis pedidos" y recuperar contraseña funcionan (el correo de recuperación necesita que el envío de correos del hosting funcione; en Hostinger suele venir listo).
 - [ ] (Si los usas) El chat de tawk.to y el botón de WhatsApp aparecen en la tienda (variables `NEXT_PUBLIC_TAWK_SRC` / `NEXT_PUBLIC_WHATSAPP` configuradas en el host).
+- [ ] (Si publicas el panel `/radar`) `RADAR_PASSWORD` está definida en el host; sin ella el panel queda abierto.
 - [ ] Todo en `https://` (SSL en ambos).
 
 ---
@@ -227,6 +231,36 @@ Cuando ya pruebes con sandbox y quieras cobrar de verdad:
 - Los **secretos** viven solo del lado servidor: los de Wompi y el de revalidación en los ajustes de WordPress (en su base de datos) y en las variables del front; nunca en el código ni en el navegador.
 - En producción **no** definas la constante `TH_REVALIDATE_URL` en `wp-config.php` (era solo para Docker con `host.docker.internal`): así el plugin usa automáticamente `URL de la tienda + /api/revalidate`.
 - Mantén WordPress, WooCommerce y los plugins actualizados.
+- El **panel `/radar`** (radar de tendencias) debe llevar `RADAR_PASSWORD` en producción; sin esa variable queda abierto a cualquiera que adivine la URL.
+
+---
+
+## 9. El panel del Radar (agente de tendencias) — opcional
+
+`/radar` es un panel **privado** donde ves las tendencias de producto que encuentra el agente (`agent/trends.py`) y marcas cuáles **Aprobar** o **Descartar**. Los clientes no lo ven: no está enlazado en la tienda, entras tú directo por la URL.
+
+**Antes de publicarlo:**
+
+- **Ponle contraseña:** define `RADAR_PASSWORD` en las variables del host. Sin ella, el panel queda **abierto a cualquiera** que adivine la URL.
+
+**Según dónde esté el front:**
+
+- **Vercel (Opción A):** el disco es de **solo lectura**. El panel **muestra** las tendencias del archivo `frontend/data/radar.json` que esté en el repo, pero **no guarda** los "Aprobar/Descartar". Para actualizar la lista, corre el agente en tu computador y haz `git push` del `radar.json` nuevo.
+- **VPS (Opción B):** el disco **sí** se puede escribir, así que las decisiones se guardan en `frontend/data/radar-decisions.json`. Para refrescar la lista con el agente:
+
+```bash
+# En el VPS, una sola vez:
+sudo apt-get install -y python3 python3-pip
+pip3 install pytrends
+
+# Correr el agente a mano (desde la carpeta del proyecto):
+python3 agent/trends.py        # regenera frontend/data/radar.json
+
+# Programarlo cada día a las 6 a.m. (con: crontab -e):
+0 6 * * * cd /ruta/al/TodoAki && /usr/bin/python3 agent/trends.py >> /var/log/radar.log 2>&1
+```
+
+> Las decisiones (`radar-decisions.json`) son tuyas y locales; están en `.gitignore`, no se suben al repo.
 
 ---
 

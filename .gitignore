@@ -1,2 +1,5 @@
 .env
 docker/shopify-products.json
+
+# Registro de la tarea del radar (se genera en cada corrida)
+agent/radar.log

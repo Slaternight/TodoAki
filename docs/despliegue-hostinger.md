@@ -264,4 +264,52 @@ python3 agent/trends.py        # regenera frontend/data/radar.json
 
 ---
 
+## 10. Fase 2 — Hacer crecer el catálogo automáticamente (hoja de ruta)
+
+*Esto todavía no está construido; es el plan para cuando quieras pasar de "aprobar tendencias en el radar" a "subir productos a la tienda sin hacerlo a mano".*
+
+El radar (Parte 9) te dice **qué** vender. La Fase 2 es **cómo** subir ese producto a WooCommerce. Hay **dos caminos**:
+
+### Camino A — Usar una app/plugin de importación (recomendado para empezar)
+
+Ya existen herramientas que importan productos (fotos, precio, variantes) a WooCommerce con pocos clics. Como la tienda es **headless**, el plugin crea el producto en el WooCommerce de atrás y **tu página en Next.js lo muestra sola** (por la Store API): no hay que programar casi nada.
+
+| Herramienta | Fuente | Costo aprox. | Nota |
+|---|---|---|---|
+| **DSers** | AliExpress (oficial) | Gratis + planes desde ~US$20/mes | Soporta WooCommerce; es el tool oficial de dropshipping de AliExpress |
+| **AliDropship / AliNext** | AliExpress | ~US$89 pago único o ~US$15/mes | Plugin dentro de tu WordPress; importa producto + reseñas |
+| **CJ Dropshipping** | CJ (bodegas propias) | Sin cuota mensual de la fuente | Tiene app para WooCommerce; buena alternativa a AliExpress |
+| **Spocket / Syncee** | Varios (incl. US/EU) | Plan mensual | Proveedores con envíos más rápidos, no solo China |
+
+> **Precios por confirmar:** cambian seguido; verifica en la página de cada herramienta antes de contratar.
+
+**Flujo con el Camino A:** el radar te marca una tendencia aprobada -> la buscas en la app (DSers/CJ) -> la importas a WooCommerce con un clic -> tu tienda la muestra. Semi-automático y andando en pocos días.
+
+### Camino B — Integración a medida (para después)
+
+Conectar el botón **"Aprobar"** del radar directo con la **API de AliExpress** (o CJ): buscar el producto real -> traer fotos/precio/specs -> crear el producto en WooCommerce **como borrador** -> tú revisas y publicas. Más control y más automático, pero más trabajo.
+
+Qué hace falta para el Camino B:
+
+- **Cuenta de API aprobada.** La API de afiliado de AliExpress se solicita aparte y pide **la URL de tu sitio web y tus fuentes de tráfico**; la aprobación tarda ~1 a 3 días hábiles. Las APIs de **pedidos/fulfillment** piden verificación de negocio adicional y suelen ser solo para socios ya establecidos. Por eso **conviene tener la página publicada**: ayuda a que te aprueben la API. (Para *construir y probar* no necesitas publicar: se hace contra tu WooCommerce local.)
+- Definir **reglas de precio** (margen y redondeo a COP).
+- Conectar con WooCommerce por su **REST API** (funciona igual desde Vercel o VPS, porque le pega a tu WordPress, no al disco).
+- En Vercel las decisiones del radar no se guardan en archivo; para la Fase 2 en la nube ese estado se mueve a WordPress.
+
+### Antes de automatizar: la realidad de importar China -> Colombia
+
+Esto afecta **el negocio**, no el código, pero es clave para que el dropshipping sea rentable:
+
+- **IVA del 19%:** China no tiene TLC con Colombia, así que las importaciones pagan **IVA del 19%** sobre el valor CIF (casi siempre).
+- **Arancel:** entre **0% y 20%** (hasta ~35% en algunos productos) según la partida arancelaria.
+- **El umbral de exención cambió en 2025:** antes los envíos de US$200 o menos iban exentos (Ley 2155/2021); en 2025 se habló de bajarlo a **US$50** por decreto. **Confírmalo con la DIAN**, porque cambia la cuenta de cada pedido.
+- **Tiempos de envío:** desde China son de **semanas**; tenlo claro al prometer entregas.
+- Evita "triangular" por EE. UU. para esquivar aranceles: es una práctica gris con riesgo legal y fiscal.
+
+> **Conclusión:** empieza por el **Camino A** con pocos productos de prueba, mide los costos reales (producto + envío + IVA + arancel) y el margen, y cuando el flujo funcione decidimos si vale la pena el **Camino B** a medida.
+
+**Fuentes (verifica precios y reglas actuales):** DSers (dsers.com), AliDropship (alidropship.com), CJ Dropshipping (cjdropshipping.com), WPBeginner ("best WooCommerce dropshipping plugins"), y para impuestos la DIAN (dian.gov.co) y Tiendanube ("AliExpress impuestos Colombia").
+
+---
+
 *Arquitectura de referencia: `tutienda.com` (Next.js) ⇄ `admin.tutienda.com` (WordPress/WooCommerce + plugin Wompi) ⇄ Wompi (pagos). El navegador solo habla con la tienda; la tienda habla con WordPress por detrás.*
